@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.db.models import F
-from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
-from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
 from rest_framework import serializers
+
+from recipes.models import AmountIngredient, Ingredient, Recipe, Tag
 from users.models import Follow
 from users.serializers import FoodgramUserSerializer
 
@@ -219,29 +219,6 @@ class RecipesForFavoriteCartFollowedSerializer(serializers.ModelSerializer):
             'image',
             'cooking_time',
         )
-
-
-class UserFollowSerializer(serializers.ModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-
-    class Meta:
-        model = Follow
-        fields = (
-            'author',
-            'user',
-        )
-
-    def validate(self, data):
-        user = data.get('user')
-        author = data.get('author')
-        if user == author:
-            message = {'Нельзя самоподписаться!'}
-            raise serializers.ValidationError(message)
-        if Follow.objects.filter(author=author, user=user).exists():
-            message = {'Вы уже подписаны на этого пользователя!'}
-            raise serializers.ValidationError(message)
-        return data
 
 
 class UserFollowSerializer(serializers.ModelSerializer):

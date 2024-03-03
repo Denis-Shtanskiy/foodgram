@@ -86,10 +86,7 @@ class Follow(models.Model):
         ]
 
     def __str__(self):
-        return (
-            f'Пользователь {self.user.username} '
-            f'подписался на {self.author.username}'
-        )
+        return f'Пользователь {self.user} подписался на {self.author}'
 
     def clean(self):
         if self.user == self.author:

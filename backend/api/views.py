@@ -7,6 +7,12 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+from rest_framework import decorators, permissions, viewsets
+from rest_framework.response import Response
+
 from recipes.models import (
     AmountIngredient,
     Favorite,
@@ -15,12 +21,6 @@ from recipes.models import (
     ShoppingCarts,
     Tag,
 )
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfgen import canvas
-from rest_framework import decorators, permissions, viewsets
-from rest_framework.response import Response
 from users.models import Follow
 
 from .filters import IngredientFilter, RecipeFilter
@@ -56,10 +56,10 @@ class CustomUserViewSet(UserViewSet):
         methods=('post', 'delete'),
         permission_classes=(permissions.IsAuthenticated,),
     )
-    def subscribe(self, request, id):
+    def subscribe(self, request, pk):
         if request.method == 'POST':
             user = request.user
-            author = get_object_or_404(User, id=id)
+            author = get_object_or_404(User, id=pk)
             if user == author:
                 message = 'Нельзя самоподписаться!'
                 return Response(message, status=BAD_REQUEST)
@@ -94,7 +94,7 @@ class CustomUserViewSet(UserViewSet):
         detail=False,
         permission_classes=(permissions.IsAuthenticated,),
     )
-    def subscriptions(self, request, pk=None):
+    def subscriptions(self, request, pk):
         user = request.user
         queryset = self.filter_queryset(
             User.objects.filter(following__user=user)
