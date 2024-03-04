@@ -1,6 +1,6 @@
 # __Foodgram - __
 
-![Github Actions main workflow](https://github.com/Denis-Shtanskiy/foodgram-project-react/workflows/main.yml/badge.svg)
+![Github Actions main workflow](https://github.com/Denis-Shtanskiy/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 
