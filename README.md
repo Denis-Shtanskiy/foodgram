@@ -1,4 +1,14 @@
-# __Foodgram - __
+# __Foodgram - продуктовый помощник__
+
+#### сайт доступен по адресу: 
+```bash
+foodgramhelper.sytes.net
+```
+#### данные для проверки админ-панели:
+```bash
+Уникальный юзернейм: AdminFoodgram
+пароль: foodgram12345
+```
 
 ![Github Actions main workflow](https://github.com/Denis-Shtanskiy/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
@@ -9,7 +19,6 @@
  - Django
  - djangorestframework
  - Python
- - gunicorn
  - Nginx
  - PostgreSQL
 
@@ -21,8 +30,8 @@ _Локальная настройка и запуск проекта_
 
 Клонировать репозиторий к себе на компьютер и перейти в директорию с проектом:
 ```bash
-git clone https://github.com/denis-shtanskiy/kittygram_final.git
-cd kittygram_final
+git clone https://github.com/denis-shtanskiy/foodgram-project-react.git
+cd foodgram-project-react
 ```
 Для проекта создать и активировать виртуальное окружение, установить зависимости:
 __для windows:__
@@ -31,7 +40,7 @@ python -m venv venv
 source venv/Scripts/activate
 python -m pip install --upgrade pip
 pip install -r backend/requirements.txt
-cd kittygram_final
+cd foodgram
 ```
 __для linux:__
 ```bash
@@ -39,20 +48,23 @@ python3 -m venv venv
 source venv/bin/activate
 python -m pip install --upgrade pip
 pip install -r backend/requirements.txt
-cd kittygram_final
+cd foodgram
 ```
 ### .env
 Для корректной работы backend-части проекта, создайте в корне файл `.env` и заполните его переменными по примеру из файла `.env.example` или по примеру ниже:
 ```bash
-POSTGRES_DB=kittygram
-POSTGRES_USER=kittygram_user
-POSTGRES_PASSWORD=kittygram_password
-DB_NAME=kittygram
-DB_HOST=kitty
-DB_PORT=12345
+POSTGRES_DB=foodgram
+POSTGRES_USER=foodgram_user
+POSTGRES_PASSWORD=foodgram_password
+DB_NAME=foodgram
+DB_HOST=db
+DB_PORT=5432
 SECRET_KEY=safq12432tdzxqxght_!erks       # стандартный ключ, который создается при старте проекта
 DEBUG=True
 ALLOWED_HOSTS=['IP_адрес_сервера', '127.0.0.1', 'localhost', 'домен_сервера']
+SUPERUSER_USERNAME=AdminFoodgram       # переменные для автоматического создания суперюзера, 
+SUPERUSER_PASSWORD=foodgram12345       # если не указать, применятся стандартные из скрипта
+SUPERUSER_EMAIL=admin@nothing.not      # вид стандартных переменных ('admin', 'admin@example.com, 'admin12345')
 ```
 
 Установите [docker compose](https://www.docker.com/) на свой компьютер.
@@ -60,11 +72,15 @@ ALLOWED_HOSTS=['IP_адрес_сервера', '127.0.0.1', 'localhost', 'дом
 * Запустить проект, ключ `-d` запускает проект в фоновом режиме
 * выполнить миграции
 * собрать статику и скопировать её
+* запустить скрипт для создания суперюзера
+* запустить менеджмент команду для загрузки базы ингредиентов
 ```bash
 docker compose -f docker-compose.prodauction.yml up --build -d
 docker compose -f docker-compose.prodauction.yml exec backend python manage.py migrate
 docker compose -f docker-compose.prodauction.yml exec backend python manage.py collectstatic  && \
 docker compose -f docker-compose.prodauction.yml exec backend cp -r /app/static_backend/. /backend_static/static/
+docker compose -f docker-compose.production.yml exec backend bash create_superuser_script.sh
+docker compose -f docker-compose.production.yml exec backend python manage.py import_ingredients ./data/ingredients.csv
 ```
 
 ## Если вы используете удаленный сервер
@@ -125,7 +141,7 @@ TELEGRAM_TO                    # id телеграм-аккаунта (можн�
 TELEGRAM_TOKEN                 # токен бота (получить токен можно у @BotFather, /token, имя бота)
 ```
 По команде `git push` в репозитории на github отрабатывают сценарии:
-* __tests__ - для всех веток проверка кода по стандартам PEP8 и запуск локальных тестов.
+* __tests__ - для всех веток проверка кода по стандартам PEP8.
 * __build_and_push_to_docker_hub__ - сборка и отправка образов в удаленный репозиторий на DockerHub
 * __deploy__ - автоматический деплой проекта
 * __send_message__ - отправка соообщения разработчику в Telegram
