@@ -219,7 +219,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ingredients = (
             AmountIngredient.objects.filter(recipe__carts__user=user)
             .values(
-                ingredient=F('ingredient__name'),
+                ingredient_item=F('ingredient__name'),
                 unit=F('ingredient__measurement_unit'),
             )
             .annotate(amount=Sum('amount'))
@@ -237,7 +237,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             page.drawString(
                 X_PCM_PDF,
                 y_for_string,
-                f'{number}. {ingredient["ingredient"]}: '
+                f'{number}. {ingredient["ingredient_item"]}: '
                 f'{ingredient["amount"]}, {ingredient["unit"]}',
             )
             y_for_string -= 20
