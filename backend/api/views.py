@@ -13,17 +13,28 @@ from reportlab.pdfgen import canvas
 from rest_framework import decorators, permissions, viewsets
 from rest_framework.response import Response
 
-from recipes.models import (AmountIngredient, Favorite, Ingredient, Recipe,
-                            ShoppingCarts, Tag)
+from recipes.models import (
+    AmountIngredient,
+    Favorite,
+    Ingredient,
+    Recipe,
+    ShoppingCarts,
+    Tag,
+)
 from users.models import Follow
 
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import LimitOnPagePagination
 from .permissions import IsAuthorOrReadOnly
-from .serializers import (FoodgramUserSerializer, IngredientSerializer,
-                          RecipeCreateSerializer, RecipeGetSerializer,
-                          RecipesForFavoriteCartFollowedSerializer,
-                          TagSerializer, UserFollowSerializer)
+from .serializers import (
+    FoodgramUserSerializer,
+    IngredientSerializer,
+    RecipeCreateSerializer,
+    RecipeGetSerializer,
+    RecipesForFavoriteCartFollowedSerializer,
+    TagSerializer,
+    UserFollowSerializer,
+)
 
 User = get_user_model()
 X_PCM_PDF = 100
@@ -214,26 +225,30 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
         )
         user = request.user
-        filename = f'{user.username}_shopping_list.pdf'
+        filename = f'{user}_shopping_list.pdf'
 
         ingredients = (
             AmountIngredient.objects.filter(recipe__carts__user=user)
             .values(
-                ingredient_in=F('ingredient__name'),
+                ingredient=F('ingredient__name'),
                 unit=F('ingredient__measurement_unit'),
             )
             .annotate(amount=Sum('amount'))
         )
 
         page.setFont('DejaVuSerif-Bold', 20)
-        page.drawString(X_PCM_PDF + 100, Y_PCM_PDF, 'Список покупок:')
+        page.drawString(
+            X_PCM_PDF + 50,
+            Y_PCM_PDF,
+            'Список продуктов, который Вам нужно приобрести:',
+        )
         y_for_string = 750
+        page.setFont('DejaVuSerif', 10)
         for number, ingredient in enumerate(ingredients, start=1):
-            page.setFont('DejaVuSerif', 10)
             page.drawString(
                 X_PCM_PDF,
                 y_for_string,
-                f'{number}. {ingredient["ingredient_in"]}: '
+                f'{number}. {ingredient["ingredient"]}: '
                 f'{ingredient["amount"]}, {ingredient["unit"]}',
             )
             y_for_string -= 20
