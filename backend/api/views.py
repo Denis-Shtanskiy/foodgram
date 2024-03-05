@@ -13,17 +13,28 @@ from reportlab.pdfgen import canvas
 from rest_framework import decorators, permissions, viewsets
 from rest_framework.response import Response
 
-from recipes.models import (AmountIngredient, Favorite, Ingredient, Recipe,
-                            ShoppingCarts, Tag)
+from recipes.models import (
+    AmountIngredient,
+    Favorite,
+    Ingredient,
+    Recipe,
+    ShoppingCarts,
+    Tag,
+)
 from users.models import Follow
 
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import LimitOnPagePagination
 from .permissions import IsAuthorOrReadOnly
-from .serializers import (FoodgramUserSerializer, IngredientSerializer,
-                          RecipeCreateSerializer, RecipeGetSerializer,
-                          RecipesForFavoriteCartFollowedSerializer,
-                          TagSerializer, UserFollowSerializer)
+from .serializers import (
+    FoodgramUserSerializer,
+    IngredientSerializer,
+    RecipeCreateSerializer,
+    RecipeGetSerializer,
+    RecipesForFavoriteCartFollowedSerializer,
+    TagSerializer,
+    UserFollowSerializer,
+)
 
 User = get_user_model()
 X_PCM_PDF = 100
@@ -214,7 +225,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
         )
         user = request.user
-        filename = f'{user}_shopping_list.pdf'
+        file = f'{user}"_shopping_list.pdf"'
 
         ingredients = (
             AmountIngredient.objects.filter(recipe__carts__user=user)
@@ -225,25 +236,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
             .annotate(amount=Sum('amount'))
         )
 
-        page.setFont('DejaVuSerif-Bold', 20)
+        page.setFont('DejaVuSerif-Bold', 13)
         page.drawString(
-            X_PCM_PDF + 50,
+            X_PCM_PDF,
             Y_PCM_PDF,
             'Список продуктов, который Вам нужно приобрести:',
         )
         y_for_string = 750
         page.setFont('DejaVuSerif', 10)
+        ingredient_list = ''
         for number, ingredient in enumerate(ingredients, start=1):
+            ingredient_list += (
+                f'\n{number}. {ingredient["ingredient_item"]}: '
+                f'{ingredient["amount"]}, {ingredient["unit"]};',
+            )
             page.drawString(
                 X_PCM_PDF,
                 y_for_string,
-                f'{number}. {ingredient["ingredient_item"]}: '
-                f'{ingredient["amount"]}, {ingredient["unit"]}',
+                ingredient_list,
             )
             y_for_string -= 20
         page.showPage()
         page.save()
         buffer.seek(0)
 
-        response = FileResponse(buffer, as_attachment=True, filename=filename)
+        response = FileResponse(buffer, as_attachment=True, filename=file)
         return response
