@@ -135,7 +135,7 @@ jobs:
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic
             sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/static/. /backend_static/static/
             sudo docker compose -f docker-compose.production.yml exec backend bash create_superuser_script.sh
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_igredients ./data/ingredients.csv
+            sudo docker compose -f docker-compose.production.yml exec backend python manage.py import_ingredients ./data/ingredients.csv
 
   send_message:
     runs-on: ubuntu-latest
@@ -156,4 +156,4 @@ jobs:
           С сообщением коммита: "${{ github.event.commits[0].message }}",
           посмотреть код можно по ссылке: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
 
-          Деплой Foodgram, был успешно выполнен, изменения и обновления можно посмотреть на https://foodgram.sytes.net
+          Деплой Foodgram, был успешно выполнен, изменения и обновления можно посмотреть на https://foodgramhelper.sytes.net
