@@ -213,8 +213,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 'UTF-8',
             )
         )
-        user = request.user
-        file = f'{user}_shopping_list.pdf'
+        user = self.request.user
+        file = f'{user.username}_shopping_list.pdf'
 
         ingredients = (
             AmountIngredient.objects.filter(recipe__carts__user=user)
@@ -233,9 +233,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
         y_for_string = 750
         page.setFont('DejaVuSerif', 10)
-        ingredient_list = ''
         for number, ingredient in enumerate(ingredients, start=1):
-            ingredient_list += (
+            ingredient_list = (
                 f'\n{number}. {ingredient["ingredient_item"]}: '
                 f'{ingredient["amount"]}, {ingredient["unit"]};'
             )
