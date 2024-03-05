@@ -214,7 +214,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
         )
         user = request.user
-        file = f'{user}"_shopping_list.pdf"'
+        file = f'{user}_shopping_list.pdf'
 
         ingredients = (
             AmountIngredient.objects.filter(recipe__carts__user=user)
