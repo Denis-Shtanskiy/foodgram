@@ -83,7 +83,7 @@ class CustomUserViewSet(UserViewSet):
         detail=False,
         permission_classes=(permissions.IsAuthenticated,),
     )
-    def subscriptions(self, request, pk):
+    def subscriptions(self, request, id):
         user = request.user
         queryset = self.filter_queryset(
             User.objects.filter(following__user=user)
