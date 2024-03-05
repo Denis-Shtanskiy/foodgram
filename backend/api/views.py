@@ -13,17 +13,28 @@ from reportlab.pdfgen import canvas
 from rest_framework import decorators, permissions, viewsets
 from rest_framework.response import Response
 
-from recipes.models import (AmountIngredient, Favorite, Ingredient, Recipe,
-                            ShoppingCarts, Tag)
+from recipes.models import (
+    AmountIngredient,
+    Favorite,
+    Ingredient,
+    Recipe,
+    ShoppingCarts,
+    Tag,
+)
 from users.models import Follow
 
 from .filters import IngredientFilter, RecipeFilter
 from .pagination import LimitOnPagePagination
 from .permissions import IsAuthorOrReadOnly
-from .serializers import (FoodgramUserSerializer, IngredientSerializer,
-                          RecipeCreateSerializer, RecipeGetSerializer,
-                          RecipesForFavoriteCartFollowedSerializer,
-                          TagSerializer, UserFollowSerializer)
+from .serializers import (
+    FoodgramUserSerializer,
+    IngredientSerializer,
+    RecipeCreateSerializer,
+    RecipeGetSerializer,
+    RecipesForFavoriteCartFollowedSerializer,
+    TagSerializer,
+    UserFollowSerializer,
+)
 
 User = get_user_model()
 X_PCM_PDF = 100
@@ -237,7 +248,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         for number, ingredient in enumerate(ingredients, start=1):
             ingredient_list += (
                 f'\n{number}. {ingredient["ingredient_item"]}: '
-                f'{ingredient["amount"]}, {ingredient["unit"]};',
+                f'{ingredient["amount"]}, {ingredient["unit"]};'
             )
             page.drawString(
                 X_PCM_PDF,
