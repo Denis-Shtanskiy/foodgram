@@ -204,7 +204,7 @@ class ShoppingCarts(models.Model):
         verbose_name='Понравившиеся рецепты',
         to=Recipe,
         on_delete=models.CASCADE,
-        related_name='carts',
+        related_name='carts_in',
     )
 
     class Meta:

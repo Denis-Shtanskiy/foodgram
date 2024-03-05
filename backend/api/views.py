@@ -56,10 +56,10 @@ class CustomUserViewSet(UserViewSet):
         methods=('post', 'delete'),
         permission_classes=(permissions.IsAuthenticated,),
     )
-    def subscribe(self, request, pk):
+    def subscribe(self, request, id):
         if request.method == 'POST':
             user = request.user
-            author = get_object_or_404(User, id=pk)
+            author = get_object_or_404(User, pk=id)
             if user == author:
                 message = 'Нельзя самоподписаться!'
                 return Response(message, status=BAD_REQUEST)
@@ -81,7 +81,7 @@ class CustomUserViewSet(UserViewSet):
 
         if request.method == 'DELETE':
             user = request.user
-            author = get_object_or_404(User, id=id)
+            author = get_object_or_404(User, pk=id)
             subscribe = Follow.objects.filter(author=author, user=user)
             if subscribe:
                 subscribe.delete()
@@ -94,7 +94,7 @@ class CustomUserViewSet(UserViewSet):
         detail=False,
         permission_classes=(permissions.IsAuthenticated,),
     )
-    def subscriptions(self, request, pk):
+    def subscriptions(self, request, pk=None):
         user = request.user
         queryset = self.filter_queryset(
             User.objects.filter(following__user=user)
@@ -130,8 +130,8 @@ class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
         if not name:
             return Ingredient.objects.all()
         return Ingredient.objects.filter(
-            Q(name__istartswith=name)
-            | (Q(name__icontains=name) & ~Q(name__istartswith=name))
+            (Q(name__icontains=name) & ~Q(name__istartswith=name))
+            | Q(name__istartswith=name)
         )
 
 
@@ -157,7 +157,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(message, status=BAD_REQUEST)
         relation = model.objects.filter(user=user, recipe=recipe)
         if relation.exists():
-            print(relation)
             return Response(
                 {f'Нельзя повторно добавить рецепт в {message}'},
                 status=BAD_REQUEST,
@@ -197,7 +196,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def shopping_cart(self, request, pk):
         if request.method == 'POST':
-            message = 'список покпок'
+            message = 'список покупок'
             return self.add_recipe(ShoppingCarts, request.user, pk, message)
         if request.method == 'DELETE':
             message = 'списка покупок'
@@ -228,12 +227,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
         file = f'{user}_shopping_list.pdf'
 
         ingredients = (
-            AmountIngredient.objects.filter(recipe__carts__user=user)
+            AmountIngredient.objects.filter(recipe__carts_in__user=user)
             .values(
                 ingredient_item=F('ingredient__name'),
                 unit=F('ingredient__measurement_unit'),
             )
-            .annotate(amount=Sum('amount'))
+            .annotate(count_amount=Sum('amount'))
         )
 
         page.setFont('DejaVuSerif-Bold', 13)
@@ -244,11 +243,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
         y_for_string = 750
         page.setFont('DejaVuSerif', 10)
-        ingredient_list = ''
         for number, ingredient in enumerate(ingredients, start=1):
-            ingredient_list += (
-                f'\n{number}. {ingredient["ingredient_item"]}: '
-                f'{ingredient["amount"]}, {ingredient["unit"]};'
+            ingredient_list = (
+                f'{number}. {ingredient["ingredient_item"]}: '
+                f'{ingredient["count_amount"]}, {ingredient["unit"]};'
             )
             page.drawString(
                 X_PCM_PDF,

@@ -221,6 +221,29 @@ class RecipesForFavoriteCartFollowedSerializer(serializers.ModelSerializer):
         )
 
 
+class UserFollowerSerializer(serializers.ModelSerializer):
+    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
+    class Meta:
+        model = Follow
+        fields = (
+            'author',
+            'user',
+        )
+
+    def validate(self, data):
+        user = data.get('user')
+        author = data.get('author')
+        if user == author:
+            message = {'Нельзя самоподписаться!'}
+            raise serializers.ValidationError(message)
+        if Follow.objects.filter(author=author, user=user).exists():
+            message = {'Вы уже подписаны на этого пользователя!'}
+            raise serializers.ValidationError(message)
+        return data
+
+
 class UserFollowSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     recipes = RecipesForFavoriteCartFollowedSerializer(
