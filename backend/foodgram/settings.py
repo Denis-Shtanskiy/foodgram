@@ -12,8 +12,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 
 DEBUG = os.getenv('DEBUG', '').lower() == 'true'
 
-ALLOWED_HOSTS = ['*']
-# os.getenv('ALLOWED_HOSTS', '127.0.0.1, localhost').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1, localhost').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -140,8 +139,8 @@ DJOSER = {
         ],
     },
     'SERIALIZERS': {
-        'user': 'users.serializers.FoodgramUserSerializer',
-        'current_user': 'users.serializers.FoodgramUserSerializer',
-        'user_create': 'users.serializers.FoodgramCreateUserSerializer',
+        'user': 'api.serializers.FoodgramUserSerializer',
+        'current_user': 'api.serializers.FoodgramUserSerializer',
+        'user_create': 'api.serializers.FoodgramCreateUserSerializer',
     },
 }

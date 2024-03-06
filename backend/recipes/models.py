@@ -38,10 +38,10 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    """Модель ингридиентов для рецептов."""
+    """Модель ингредиентов для рецептов."""
 
     name = models.CharField(
-        verbose_name='Ингридиент',
+        verbose_name='Ингредиент',
         max_length=MAX_LENGTH_CHARFIELD,
     )
     measurement_unit = models.CharField(
@@ -51,8 +51,8 @@ class Ingredient(models.Model):
 
     class Meta:
         ordering = ('name',)
-        verbose_name = 'Ингридиент'
-        verbose_name_plural = 'Ингридиенты'
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
         constraints = [
             UniqueConstraint(
                 fields=('name', 'measurement_unit'),
@@ -85,7 +85,7 @@ class Recipe(models.Model):
         verbose_name='Описание рецепта',
     )
     ingredients = models.ManyToManyField(
-        verbose_name='Ингридиенты',
+        verbose_name='Ингредиенты',
         to=Ingredient,
         through='AmountIngredient',
         related_name='recipes',
@@ -126,10 +126,10 @@ class Recipe(models.Model):
 
 
 class AmountIngredient(models.Model):
-    """Модель количества ингридиентов в рецепте."""
+    """Модель количества ингредиентов в рецепте."""
 
     recipe = models.ForeignKey(
-        verbose_name='Количество ингридиента в рецепте',
+        verbose_name='Количество ингредиента в рецепте',
         to=Recipe,
         on_delete=models.CASCADE,
         related_name='amount_recipe',
@@ -153,8 +153,14 @@ class AmountIngredient(models.Model):
 
     class Meta:
         ordering = ('recipe',)
-        verbose_name = 'Количество ингридиента'
-        verbose_name_plural = 'Количество ингридиентов'
+        verbose_name = 'Количество ингредиента'
+        verbose_name_plural = 'Количество ингредиентов'
+        constraints = [
+            UniqueConstraint(
+                fields=('recipe', 'ingredient'),
+                name='unique_ingredient_for_recipe',
+            )
+        ]
 
     def __str__(self):
         return f' {self.amount} {self.ingredient} в {self.recipe}'

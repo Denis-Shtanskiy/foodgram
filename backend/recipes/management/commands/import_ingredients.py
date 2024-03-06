@@ -3,7 +3,7 @@ from recipes.models import Ingredient
 
 
 class Command(ImportCsvCommand):
-    help = 'Импорт ингридиентов из файла CSV.'
+    help = 'Импорт ингредиентов из файла CSV.'
 
     def process_row(self, row):
         Ingredient.objects.get_or_create(
