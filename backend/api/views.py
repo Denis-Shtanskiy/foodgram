@@ -134,10 +134,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if self.action in actions:
             return RecipeCreateSerializer
         return super().get_serializer_class()
-    """def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return RecipeGetSerializer
-        return super().get_serializer_class()"""
 
     def add_recipe(self, model, user, pk, message):
         recipe = get_object_or_404(Recipe, id=pk)
