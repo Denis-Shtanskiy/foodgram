@@ -120,7 +120,6 @@ class IngredientsViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.select_related('author').all()
-    serializer_class = RecipeGetSerializer
     pagination_class = LimitOnPagePagination
     permission_classes = (IsAuthorOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
@@ -130,10 +129,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     def get_serializer_class(self):
-        actions = ['create', 'update', 'partial_update']
-        if self.action in actions:
-            return RecipeCreateSerializer
-        return super().get_serializer_class()
+        if self.request.method == 'GET':
+            return RecipeGetSerializer
+        return RecipeCreateSerializer
 
     def add_recipe(self, model, user, pk, message):
         recipe = get_object_or_404(Recipe, id=pk)
@@ -203,40 +201,46 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 'UTF-8',
             )
         )
-        user = request.user
-        file = f'{user.username}_shopping_list.pdf'
+        file = '_shopping_list'
 
         ingredients = (
-            AmountIngredient.objects.filter(recipe__carts_in__user=user)
-            .values(
-                ingredient_item=F('ingredient__name'),
-                unit=F('ingredient__measurement_unit'),
+            AmountIngredient.objects.annotate(
+                sum_amount=Sum('ingredient__amount_ingredient__amount')
             )
-            .annotate(count_amount=Sum('amount'))
+            .values(
+                'ingredient__name',
+                'ingredient__measurement_unit',
+                'sum_amount',
+            )
+            .filter(recipe__carts_in__user=request.user)
         )
-
         page.setFont('DejaVuSerif-Bold', 13)
         page.drawString(
             X_PCM_PDF,
             Y_PCM_PDF,
-            'Список продуктов, который Вам нужно приобрести:',
+            'Список продуктов, который Вам потребуется:',
         )
         y_for_string = 750
         page.setFont('DejaVuSerif', 10)
         for number, ingredient in enumerate(ingredients, start=1):
-            ingredient_list = (
-                f'{number}. {ingredient["ingredient_item"]}: '
-                f'{ingredient["count_amount"]}, {ingredient["unit"]};'
+            ingredients_list = (
+                f'{number}. {ingredient["ingredient__name"]}: '
+                f'{ingredient["sum_amount"]} '
+                f'{ingredient["ingredient__measurement_unit"]};'
             )
             page.drawString(
                 X_PCM_PDF,
                 y_for_string,
-                ingredient_list,
+                ingredients_list,
             )
             y_for_string -= 20
         page.showPage()
         page.save()
         buffer.seek(0)
 
-        response = FileResponse(buffer, as_attachment=True, filename=file)
+        response = FileResponse(
+            buffer,
+            as_attachment=True,
+            filename=f'{request.user.username}_{file}.pdf',
+        )
         return response
