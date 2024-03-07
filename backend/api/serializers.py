@@ -230,7 +230,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         queryset=Tag.objects.all(),
         many=True,
     )
-    image = Base64ImageField()
+    image = Base64ImageField(read_only=True)
 
     class Meta:
         model = Recipe
@@ -311,8 +311,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         tags = validated_data.get('tags')
         ingredients = validated_data.get('ingredients')
-        instance = super().update(instance, validated_data)
         AmountIngredient.objects.filter(recipe=instance).delete()
+        instance = super().update(instance, validated_data)
         self.create_tags_and_ingredients(ingredients, tags, instance)
         return instance
 
