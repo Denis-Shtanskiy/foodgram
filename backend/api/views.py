@@ -221,8 +221,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
             'Список продуктов, который Вам потребуется:',
         )
         y_for_string = 750
-        page.setFont('DejaVuSerif', 10)
         for number, ingredient in enumerate(ingredients, start=1):
+            page.setFont('DejaVuSerif', 10)
             ingredients_list = (
                 f'{number}. {ingredient["ingredient__name"]}: '
                 f'{ingredient["sum_amount"]} '
@@ -235,7 +235,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
             y_for_string -= 20
             if y_for_string <= 50:
-                page.setFont('DejaVuSerif', 10)
                 page.showPage()
                 y_for_string = 800
         page.save()
