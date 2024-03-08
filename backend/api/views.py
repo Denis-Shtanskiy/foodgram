@@ -81,7 +81,7 @@ class CustomUserViewSet(UserViewSet):
         user = request.user
         queryset = self.filter_queryset(
             User.objects.filter(following__user=user)
-        )[: int(request.query_param.get('recipe_limit'))]
+        )
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = UserFollowSerializer(
@@ -234,8 +234,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 ingredients_list,
             )
             y_for_string -= 20
-            page.showPage()
-            page.save()
+            if y_for_string <= 50:
+                page.showPage()
+                y_for_string = 800
+        page.save()
         buffer.seek(0)
 
         response = FileResponse(

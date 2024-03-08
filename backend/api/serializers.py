@@ -98,9 +98,7 @@ class UserFollowerSerializer(serializers.ModelSerializer):
 
 
 class UserFollowSerializer(UserFollowerSerializer, FoodgramUserSerializer):
-    recipes = RecipesForFavoriteCartFollowedSerializer(
-        many=True, read_only=True
-    )  # serializers.SerializerMethodField()
+    recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -125,18 +123,18 @@ class UserFollowSerializer(UserFollowerSerializer, FoodgramUserSerializer):
     def get_recipes_count(self, obj):
         return obj.recipes.count()
 
-    # def get_recipes(self, obj):
-    #     request = self.context.get('request')
-    #     recipes_limit = int(request.query_param.get('recipes_limit'))
-    #     recipes = obj.recipes.all()
-    #     if recipes_limit:
-    #         recipes = recipes[:recipes_limit]
-    #     serializer = RecipesForFavoriteCartFollowedSerializer(
-    #         recipes,
-    #         many=True,
-    #         read_only=True,
-    #     )
-    #     return serializer.data
+    def get_recipes(self, obj):
+        request = self.context.get('request')
+        recipes_limit = int(request.query_params.get('recipes_limit'))
+        recipes = obj.recipes.all()
+        if recipes_limit:
+            recipes = recipes[:recipes_limit]
+        serializer = RecipesForFavoriteCartFollowedSerializer(
+            recipes,
+            many=True,
+            read_only=True,
+        )
+        return serializer.data
 
 
 class TagSerializer(serializers.ModelSerializer):
