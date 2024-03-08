@@ -235,6 +235,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
             y_for_string -= 20
             if y_for_string <= 50:
+                page.setFont('DejaVuSerif', 10)
                 page.showPage()
                 y_for_string = 800
         page.save()
