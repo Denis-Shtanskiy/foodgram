@@ -100,7 +100,7 @@ class UserFollowerSerializer(serializers.ModelSerializer):
 class UserFollowSerializer(UserFollowerSerializer, FoodgramUserSerializer):
     recipes = RecipesForFavoriteCartFollowedSerializer(
         many=True, read_only=True
-    )
+    )  # serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
@@ -124,6 +124,19 @@ class UserFollowSerializer(UserFollowerSerializer, FoodgramUserSerializer):
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
+
+    # def get_recipes(self, obj):
+    #     request = self.context.get('request')
+    #     recipes_limit = int(request.query_param.get('recipes_limit'))
+    #     recipes = obj.recipes.all()
+    #     if recipes_limit:
+    #         recipes = recipes[:recipes_limit]
+    #     serializer = RecipesForFavoriteCartFollowedSerializer(
+    #         recipes,
+    #         many=True,
+    #         read_only=True,
+    #     )
+    #     return serializer.data
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -311,6 +324,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
+        instance.tags.clear()
         instance = super().update(instance, validated_data)
         AmountIngredient.objects.filter(recipe=instance).delete()
         self.create_tags_and_ingredients(ingredients, tags, instance)
