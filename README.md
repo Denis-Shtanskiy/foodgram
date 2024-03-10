@@ -70,7 +70,7 @@ SUPERUSER_EMAIL=admin@nothing.not      # вид стандартных пере�
 * запустить скрипт для создания суперюзера
 * запустить менеджмент команду для загрузки базы ингредиентов
 ```bash
-docker compose -f docker-compose.prodauction.yml up --build -d
+docker compose -f docker-compose.prodauction.yml up -d
 docker compose -f docker-compose.prodauction.yml exec backend python manage.py migrate
 docker compose -f docker-compose.prodauction.yml exec backend python manage.py collectstatic  && \
 docker compose -f docker-compose.prodauction.yml exec backend cp -r /app/static_backend/. /backend_static/static/
