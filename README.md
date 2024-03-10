@@ -4,11 +4,6 @@
 ```bash
 foodgramhelper.sytes.net
 ```
-#### данные для проверки админ-панели:
-```bash
-Уникальный юзернейм: AdminFoodgram
-пароль: foodgram12345
-```
 
 ![Github Actions main workflow](https://github.com/Denis-Shtanskiy/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
